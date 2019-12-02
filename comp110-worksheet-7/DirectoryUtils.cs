@@ -131,7 +131,7 @@ namespace comp110_worksheet_7
         // Get the path and size (in bytes) of the smallest file below the given directory
         public static Tuple<string, long> GetSmallestFile(string directory)
         {
-            Tuple<String, long> smallestFile = new Tuple<string, long>("notFound", 0);
+            Tuple<String, long> smallestFile = new Tuple<string, long>("notFound", 10000000000);
 
             Stack<string> subDirectories = new Stack<string>();
 
@@ -151,23 +151,98 @@ namespace comp110_worksheet_7
 
                     string[] newFiles = Directory.GetFiles(currentDirectory);
 
+                    for (int i = 0; i <newFiles.Length; i++)
+                    {
+                        long fileSize = GetFileSize(newFiles[i]);
 
+                        if (fileSize < smallestFile.Item2)
+                        {
+                            smallestFile = new Tuple<string, long>(newFiles[i], fileSize);
+                        }
+                    }
                 }
-
-                return smallestFile;
+                
             }
+
+            return smallestFile;
         }
 
 		// Get the path and size (in bytes) of the largest file below the given directory
 		public static Tuple<string, long> GetLargestFile(string directory)
 		{
-			throw new NotImplementedException();
-		}
+            Tuple<String, long> largestFile = new Tuple<string, long>("notFound", 0);
+
+            Stack<string> subDirectories = new Stack<string>();
+
+            if (IsDirectory(directory))
+            {
+                subDirectories.Push(directory);
+
+                while (subDirectories.Count > 0)
+                {
+                    string currentDirectory = subDirectories.Pop();
+                    string[] newDirectories = Directory.GetDirectories(currentDirectory);
+
+                    for (int i = 0; i < newDirectories.Length; i++)
+                    {
+                        subDirectories.Push(newDirectories[i]);
+                    }
+
+                    string[] newFiles = Directory.GetFiles(currentDirectory);
+
+                    for (int i = 0; i < newFiles.Length; i++)
+                    {
+                        long fileSize = GetFileSize(newFiles[i]);
+
+                        if (fileSize > largestFile.Item2)
+                        {
+                            largestFile = new Tuple<string, long>(newFiles[i], fileSize);
+                        }
+                    }
+                }
+
+            }
+
+            return largestFile;
+        }
 
 		// Get all files whose size is equal to the given value (in bytes) below the given directory
 		public static IEnumerable<string> GetFilesOfSize(string directory, long size)
 		{
-			throw new NotImplementedException();
-		}
+            List<string> filesOfSize = new List<string>(); ;
+
+            Stack<string> subDirectories = new Stack<string>();
+
+            if (IsDirectory(directory))
+            {
+                subDirectories.Push(directory);
+
+                while (subDirectories.Count > 0)
+                {
+                    string currentDirectory = subDirectories.Pop();
+                    string[] newDirectories = Directory.GetDirectories(currentDirectory);
+
+                    for (int i = 0; i < newDirectories.Length; i++)
+                    {
+                        subDirectories.Push(newDirectories[i]);
+                    }
+
+                    string[] newFiles = Directory.GetFiles(currentDirectory);
+
+                    for (int i = 0; i < newFiles.Length; i++)
+                    {
+                        long fileSize = GetFileSize(newFiles[i]);
+
+                        if (fileSize == size)
+                        {
+                            filesOfSize.Add(newFiles[i]);
+                        }
+                    }
+                }
+
+            }
+
+            return filesOfSize;
+        }
 	}
 }
